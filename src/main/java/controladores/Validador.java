@@ -41,30 +41,34 @@ public class Validador extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		
-		//Agregar nuevo proveedor
-		
 		ProveedorDao proveedorDao = new ProveedorDao();
-		if (request.getParameter("txtId").equals("")) {
+		String txtId = request.getParameter("txtId");
+		
+		//Validar que ID no sea nulo ni vacío
+		
+		
+		if (txtId == null || txtId.trim().isEmpty()) {
 			List<Proveedor> proveedores = proveedorDao.findAll();
 			request.setAttribute("proveedores", proveedores);
 			request.getRequestDispatcher("proveedoresInicio.jsp").forward(request, response);
 		} else {
-			Integer id = Integer.parseInt(request.getParameter("txtId"));
-			List<Proveedor> proveedores = proveedorDao.findAll();
-			boolean proveedorExiste = false;
-			
-			for(Proveedor proveedor : proveedores) {
-				if(proveedor.getId().equals(id)) {
-					proveedorExiste = true;
-					break;
-				}
-			}
+			try {
+				Integer id = Integer.parseInt(txtId);
+				List<Proveedor> proveedores = proveedorDao.findAll();
+				boolean proveedorExiste = false;
+				
+				for(Proveedor proveedor : proveedores) {
+					if(proveedor.getId().equals(id)) {
+						proveedorExiste = true;
+						break;
+					}
+				}			 		
 			
 			if (proveedorExiste) {
 				request.setAttribute("proveedores", proveedores);
 				request.getRequestDispatcher("proveedoresInicio.jsp").forward(request, response);
 			} else {
-				id = Integer.parseInt(request.getParameter("txtId"));
+				id = Integer.parseInt(txtId);
 				String nombre = request.getParameter("txtNombre");
 				String rut = request.getParameter("txtRut");
 				String direccion = request.getParameter("txtDireccion");
@@ -81,7 +85,11 @@ public class Validador extends HttpServlet {
 				
 			}
 			
-			
+			} catch (NumberFormatException e) {
+				// TODO: handle exception
+				request.setAttribute("error", "ID inválido. Por favor ingrese un número");
+				request.getRequestDispatcher("error.jsp").forward(request, response);
+			}
 			
 			
 			
